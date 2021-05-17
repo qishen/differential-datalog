@@ -520,7 +520,8 @@ fn test_join(nthreads: usize) {
             rules: Vec::new(),
             arrangements: vec![Arrangement::Map {
                 name: Cow::from("arrange2.0"),
-                afun: afun1 as ArrangeFunc,
+                // afun: afun1 as ArrangeFunc,
+                afun: Arc::new(afun1),
                 queryable: true,
             }],
             change_cb: Some(Arc::new(move |_, v, w| set_update("T2", &relset2, v, w))),
@@ -680,7 +681,8 @@ fn test_streamjoin(nthreads: usize) {
             arrangements: vec![
                 Arrangement::Map {
                     name: Cow::from("arrange1.0"),
-                    afun: afun1 as ArrangeFunc,
+                    // afun: afun1 as ArrangeFunc,
+                    afun: Arc::new(afun1),
                     queryable: false,
                 },
                 Arrangement::Set {
@@ -1530,7 +1532,8 @@ fn test_recursion(nthreads: usize) {
             rules: Vec::new(),
             arrangements: vec![Arrangement::Map {
                 name: Cow::from("arrange_by_parent"),
-                afun: arrange_by_fst as ArrangeFunc,
+                // afun: arrange_by_fst as ArrangeFunc,
+                afun: Arc::new(arrange_by_fst),
                 queryable: false,
             }],
             change_cb: Some(Arc::new(move |_, v, w| {
@@ -1570,7 +1573,8 @@ fn test_recursion(nthreads: usize) {
             arrangements: vec![
                 Arrangement::Map {
                     name: Cow::from("arrange_by_ancestor"),
-                    afun: arrange_by_fst as ArrangeFunc,
+                    // afun: arrange_by_fst as ArrangeFunc,
+                    afun: Arc::new(arrange_by_fst),
                     queryable: false,
                 },
                 Arrangement::Set {
@@ -1580,7 +1584,8 @@ fn test_recursion(nthreads: usize) {
                 },
                 Arrangement::Map {
                     name: Cow::from("arrange_by_snd"),
-                    afun: arrange_by_snd as ArrangeFunc,
+                    // afun: arrange_by_snd as ArrangeFunc,
+                    afun: Arc::new(arrange_by_snd),
                     queryable: false,
                 },
             ],

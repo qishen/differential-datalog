@@ -133,11 +133,14 @@ pub type InspectFunc = fn(&DDValue, TupleTS, Weight) -> ();
 /// Function type used to arrange a relation into key-value pairs
 /// (see `XFormArrangement::Join`, `XFormArrangement::Antijoin`).
 pub type ArrangeFunc = fn(DDValue) -> Option<(DDValue, DDValue)>;
+pub type ArrangeDynFunc = Arc<dyn Fn(DDValue) -> Option<(DDValue, DDValue)> + Sync + Send>;
+// pub type ArrangeFunc = Arc<fn(DDValue) -> Option<(DDValue, DDValue)>>;
 
 /// Function type used to assemble the result of a join into a value.
 /// Takes join key and a pair of values from the two joined relations
 /// (see `XFormArrangement::Join`).
 pub type JoinFunc = fn(&DDValue, &DDValue, &DDValue) -> Option<DDValue>;
+// pub type JoinDynFunc = Arc<dyn Fn(&DDValue, &DDValue, &DDValue) -> Option<DDValue>>;
 
 /// Similar to JoinFunc, but only takes values from the two joined
 /// relations, and not the key (`XFormArrangement::StreamJoin`).
@@ -744,7 +747,7 @@ pub enum Arrangement {
         /// Arrangement name; does not have to be unique
         name: Cow<'static, str>,
         /// Function used to produce arrangement.
-        afun: ArrangeFunc,
+        afun: ArrangeDynFunc,
         /// The arrangement can be queried using `RunningProgram::query_arrangement`
         /// and `RunningProgram::dump_arrangement`.
         queryable: bool,
@@ -787,8 +790,8 @@ impl Arrangement {
         S::Timestamp: Lattice + Ord + TotalOrder,
     {
         let kind = match *self {
-            Arrangement::Map { afun, .. } => ArrangementKind::Map {
-                value_function: afun,
+            Arrangement::Map { ref afun, .. } => ArrangementKind::Map {
+                value_function: afun.clone(),
             },
             Arrangement::Set {
                 fmfun, distinct, ..
@@ -820,8 +823,8 @@ impl Arrangement {
         S::Timestamp: Lattice + Ord,
     {
         let kind = match *self {
-            Arrangement::Map { afun, .. } => ArrangementKind::Map {
-                value_function: afun,
+            Arrangement::Map { ref afun, .. } => ArrangementKind::Map {
+                value_function: afun.clone(),
             },
             Arrangement::Set {
                 fmfun, distinct, ..
