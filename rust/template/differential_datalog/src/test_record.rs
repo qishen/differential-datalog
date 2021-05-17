@@ -136,6 +136,16 @@ fn test_bool() {
 }
 
 #[test]
+fn test_symbolic() {
+    use std::borrow::Cow;
+    let foo = "foo";
+    let symbolic_record_foo = Record::Symbolic(Cow::from(&foo[..]));
+    let symbolic_record_foo2 = Record::Symbolic(Cow::from("foo".to_string()));
+    println!("symbol: {}", symbolic_record_foo);
+    assert_eq!(symbolic_record_foo, symbolic_record_foo2);
+}
+
+#[test]
 fn test_string() {
     assert_eq!(
         String::from_record(&Record::String("foo".to_string())),

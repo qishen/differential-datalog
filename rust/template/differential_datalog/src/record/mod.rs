@@ -57,6 +57,8 @@ pub enum Record {
     Float(OrderedFloat<f32>),
     Double(OrderedFloat<f64>),
     String(String),
+    Symbolic(Name),
+    Variable(Name),
     /// Value serialized in a string.  The first field stores the name of the
     /// serialization format, e.g., "json".
     Serialized(Name, String),
@@ -83,7 +85,11 @@ impl Record {
         matches!(self, Self::Double(_))
     }
 
-    pub const fn is_struct(&self) -> bool {
+    pub fn is_symbolic(&self) -> bool {
+        matches!(self, Self::Symbolic(_))
+    }
+
+    pub fn is_struct(&self) -> bool {
         matches!(self, Self::PosStruct(_, _) | Self::NamedStruct(_, _))
     }
 
@@ -211,6 +217,8 @@ impl fmt::Display for Record {
             Record::Float(d) => d.fmt(f),
             Record::Double(d) => d.fmt(f),
             Record::String(s) => format_ddlog_str(s.as_ref(), f),
+            Record::Symbolic(n) => write!(f, "Symbolic{{{}}}", n),
+            Record::Variable(n) => write!(f, "Var{{{}}}", n),
             Record::Serialized(n, s) => {
                 write!(f, "#{}", n)?;
                 format_ddlog_str(s.as_ref(), f)
